@@ -15,7 +15,7 @@ const initializeDBAndServer = async () => {
     });
     app.listen(3000, () => {
       console.log(
-        `The Server Started Running at http://localhost:3000/players/`
+        `The Server Started Running at http://localhost:3000/movies/`
       );
     });
   } catch (e) {
