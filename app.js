@@ -55,12 +55,63 @@ app.post("/movies/", async (request, response) => {
     INSERT INTO 
         movie
     (director_id, movie_name, lead_actor)
-
     VALUES
-        (${directorId}. '${movieName}', '${leadActor}')
+        (${directorId}, '${movieName}', '${leadActor}')
     `;
-  const movie = await db.run(snakeCaseToCamelCase(movieDetails));
+  const movie = await db.run(movieDetails);
   response.send("Movie Successfully Added");
 });
 
 module.exports = app;
+
+// API call for single movie
+
+app.get("/movies/:movieId/", async (request, response) => {
+  const { movieId } = request.params;
+  const getPlayerQuery = `
+    SELECT 
+      * 
+    FROM 
+      movie 
+    WHERE 
+      movie_id = ${movieId};`;
+  const player = await db.get(getPlayerQuery);
+  response.send(snakeCaseToCamelCase(player));
+});
+
+app.put("movies/:movieId", async (request, response) => {
+  const { movieId } = request.params;
+  const { directorId, movieName, leadActor } = request.body;
+  const movie = `
+    UPDATE
+        movie
+    SET 
+        director_id = ${directorId},
+        movie_name = '${movieName}',
+        lead_actor = '${leadActor}'
+    `;
+  await db.run(movie);
+  response.send("Movie Details Updated");
+});
+
+app.delete("/movies/:movieId/", async (request, response) => {
+  const { movieId } = request.params;
+  const movieDeleted = `
+    DELETE FROM 
+        movie
+    WHERE
+        movie_id = ${movieId};
+    `;
+});
+
+app.get("/directors/", async (request, response) => {
+  const getDirectorsQuery = `
+    SELECT
+      *
+    FROM
+      director;`;
+  const directorsArray = await db.all(getDirectorsQuery);
+  response.send(
+    directorsArray.map((eachDirector) => snakeCaseToCamelCase(eachDirector))
+  );
+});
